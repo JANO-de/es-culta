@@ -1,0 +1,164 @@
+/* =====================================================================================
+   Liars Bar · estilos propios. Todas las clases llevan el prefijo lb- para no chocar con
+   las existentes. Igual que la caja de la Ruleta, la mesa es oscura en ambos temas.
+   Usa las mismas fuentes (--display, --body) y tokens (--gold, --yes, --no) de la app.
+   ===================================================================================== */
+:root {
+  --lb-bar: #1A0F12; --lb-bar2: #2A1519; --lb-ink: #F3E9DC; --lb-muted: #B9A898;
+  --lb-felt: #14422E; --lb-felt2: #0C2D1F; --lb-rail: #4A1D24; --lb-brass: #D9A847;
+  --lb-red: #E5483B; --lb-green: #46C384; --lb-paper: #F7F0E1; --lb-paper-ink: #2A1A12; --lb-wine: #7A1E2C;
+}
+
+#stage.lb-stage {
+  background: radial-gradient(120% 80% at 50% 0%, var(--lb-bar2), var(--lb-bar));
+  border-color: var(--lb-rail); color: var(--lb-ink);
+}
+#stage.lb-stage .muted, #stage.lb-stage .meta { color: var(--lb-muted); }
+#stage.lb-stage .bar { background: rgba(255, 255, 255, 0.12); }
+#stage.lb-stage .bar > i { background: var(--lb-brass); }
+#stage.lb-stage .bar.low > i { background: var(--lb-red); }
+#stage.lb-stage small { font-size: 0.8125rem; color: var(--lb-muted); font-weight: 400; }
+
+/* lobby: tarjeta del modo */
+.mode.lb-mode { grid-column: 1 / -1; background: linear-gradient(135deg, #2A1519, #14422E); border-color: var(--lb-rail); color: var(--lb-ink); }
+.mode.lb-mode p { color: var(--lb-muted); }
+.mode.lb-mode h3::before { content: "♠ "; color: var(--lb-brass); }
+.mode.lb-mode button.primary { background: var(--lb-brass); border-color: var(--lb-brass); color: #1A0F12; }
+
+/* mesa */
+.lb-felt {
+  border-radius: 1.4rem; padding: 0.9rem; display: flex; flex-direction: column; gap: 0.9rem;
+  background: radial-gradient(ellipse at 50% 55%, var(--lb-felt), var(--lb-felt2) 75%);
+  border: 8px solid var(--lb-rail); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.55), 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.lb-seats { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 0.5rem; }
+.lb-seat {
+  position: relative; background: rgba(0, 0, 0, 0.28); border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 0.8rem;
+  padding: 0.5rem 0.55rem 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; align-items: center; text-align: center; min-width: 0;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+.lb-nm { font-weight: 700; font-size: 0.9375rem; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-sub { font-size: 0.75rem; color: var(--lb-muted); font-variant-numeric: tabular-nums; }
+.lb-seat.lb-me { border-color: rgba(217, 168, 71, 0.45); }
+.lb-seat.lb-active { border-color: var(--lb-brass); box-shadow: 0 0 0 2px var(--lb-brass), 0 0 18px rgba(217, 168, 71, 0.55); transform: translateY(-2px); }
+.lb-seat.lb-dead { opacity: 0.45; filter: grayscale(1); }
+.lb-seat.lb-dead .lb-nm { text-decoration: line-through; }
+.lb-seat.lb-caller { border-color: var(--lb-brass); }
+.lb-seat.lb-shooter { border-color: var(--lb-red); box-shadow: 0 0 16px rgba(229, 72, 59, 0.6); }
+.lb-minis { display: flex; height: 1.4rem; }
+.lb-minis i { width: 0.95rem; height: 1.35rem; border-radius: 0.15rem; margin-left: -0.35rem; border: 1px solid rgba(255, 255, 255, 0.5);
+  background: repeating-linear-gradient(45deg, var(--lb-wine) 0 3px, #5A1420 3px 6px); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+.lb-minis i:first-child { margin-left: 0; }
+
+.lb-gun { display: inline-flex; gap: 3px; vertical-align: middle; }
+.lb-gun i { width: 0.55rem; height: 0.55rem; border-radius: 50%; border: 1.5px solid var(--lb-brass); background: transparent; }
+.lb-gun i.lb-used { background: #6B6460; border-color: #6B6460; }
+
+.lb-badge { position: absolute; top: -0.6rem; right: -0.3rem; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.1rem 0.45rem; border-radius: 999px; background: #3A2A20; color: var(--lb-ink); border: 1px solid rgba(255, 255, 255, 0.2); white-space: nowrap; }
+.lb-bturn { background: var(--lb-brass); color: #1A0F12; border-color: var(--lb-brass); }
+.lb-bcall { background: var(--lb-brass); color: #1A0F12; border-color: var(--lb-brass); animation: lb-pop 0.4s ease-out both; }
+.lb-blie { background: var(--lb-red); border-color: var(--lb-red); color: #fff; }
+.lb-btrue { background: var(--lb-green); border-color: var(--lb-green); color: #08150E; }
+
+.lb-center { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; padding: 0.3rem 0 0.2rem; }
+.lb-tablecard { display: flex; align-items: center; gap: 0.6rem; padding: 0.25rem 0.4rem 0.25rem 0.9rem; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35); border: 1.5px dashed var(--lb-brass); font-size: 0.8125rem; color: var(--lb-muted); }
+.lb-tablecard strong { font-family: var(--display); font-size: 1.125rem; color: #1A0F12; background: var(--lb-brass); padding: 0.1rem 0.75rem; border-radius: 999px; }
+.lb-claim { font-size: 0.9375rem; text-align: center; color: var(--lb-ink); text-wrap: balance; }
+
+/* cartas */
+.lb-card {
+  --w: 4.1rem; position: relative; width: var(--w); height: calc(var(--w) * 1.42); flex: 0 0 auto; border-radius: 0.45rem;
+  background: var(--lb-paper); color: var(--lb-paper-ink); border: 1.5px solid #CDBB9A; padding: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45); font-family: var(--display); line-height: 1;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.lb-card .lb-corner { position: absolute; top: 0.25rem; left: 0.35rem; font-weight: 600; font-size: 0.9rem; }
+.lb-card .lb-glyph { font-size: 1.9rem; }
+.lb-card .lb-name { font-family: var(--body); font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.lb-cK, .lb-cQ { color: var(--lb-wine); }
+.lb-cJ { background: linear-gradient(160deg, #FFF6D6, #F2D27A); color: #5A3A00; border-color: var(--lb-brass); }
+.lb-back { background: repeating-linear-gradient(45deg, var(--lb-wine) 0 6px, #5A1420 6px 12px); border: 2px solid var(--lb-paper); }
+.lb-back::after { content: "♠"; position: absolute; inset: 0; display: grid; place-items: center; color: rgba(247, 240, 225, 0.55); font-size: 1.3rem; }
+
+button.lb-card { cursor: pointer; border-radius: 0.45rem; font-weight: 600; }
+button.lb-card:hover { transform: translateY(-4px); }
+.lb-card.lb-sel { transform: translateY(-12px); box-shadow: 0 0 0 3px var(--lb-brass), 0 10px 16px rgba(0, 0, 0, 0.5); }
+
+/* montón de la mesa */
+.lb-pile { position: relative; width: 9rem; height: 6.6rem; display: grid; place-items: center; }
+.lb-pilecard { --w: 3.1rem; position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--rot)); }
+.lb-fly { animation: lb-fly 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) var(--d, 0s) both; }
+.lb-empty { font-size: 0.8125rem; color: var(--lb-muted); border: 1.5px dashed rgba(255, 255, 255, 0.2); border-radius: 0.5rem; padding: 1.4rem 0.8rem; }
+
+/* destapar */
+.lb-reveal { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; perspective: 600px; }
+.lb-flip { position: relative; }
+.lb-flip.lb-anim .lb-card { animation: lb-flip 0.6s ease-out var(--d) both; backface-visibility: hidden; }
+.lb-flip.lb-bad .lb-card { box-shadow: 0 0 0 3px var(--lb-red), 0 0 18px rgba(229, 72, 59, 0.8); }
+.lb-caught { animation: lb-shake 0.45s ease-in-out 1.4s both; }
+.lb-stamp { font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; border: 3px solid currentColor; border-radius: 0.4rem;
+  padding: 0.15rem 0.8rem; transform: rotate(-4deg); font-size: 1.125rem; }
+.lb-stamp.lb-sl { color: var(--lb-red); } .lb-stamp.lb-st { color: var(--lb-green); }
+.lb-stamp.lb-late { animation: lb-stampin 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) 1.3s both; }
+p.lb-late { animation: lb-fade 0.4s ease-out 1.6s both; }
+p.lb-late2 { animation: lb-fade 0.4s ease-out 1.9s both; font-size: 1.0625rem; }
+.lb-hint { color: var(--lb-brass); }
+
+/* revólver */
+.lb-shot { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; position: relative; }
+.lb-cyl { position: relative; width: 6.5rem; height: 6.5rem; border-radius: 50%; background: radial-gradient(circle, #8B8580, #3D3936 70%);
+  border: 3px solid #26221F; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6); animation: lb-spin 1.6s cubic-bezier(0.15, 0.6, 0.3, 1) both; }
+.lb-cyl::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1rem; height: 1rem; transform: translate(-50%, -50%); border-radius: 50%; background: #26221F; }
+.lb-cyl i { position: absolute; left: 50%; top: 50%; width: 1.35rem; height: 1.35rem; margin: -0.675rem; border-radius: 50%;
+  background: #141210; box-shadow: inset 0 2px 4px #000; transform: rotate(var(--a)) translateY(-2.05rem); }
+.lb-cyl i.lb-used { background: #4A4440; }
+.lb-result { font-family: var(--display); font-weight: 600; font-size: 2.6rem; line-height: 1; animation: lb-stampin 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) 1.65s both; }
+.lb-bang .lb-result { color: var(--lb-red); text-shadow: 0 0 22px rgba(229, 72, 59, 0.9); }
+.lb-click .lb-result { color: var(--lb-muted); font-style: italic; }
+#stage.lb-stage:has(.lb-bang) { animation: lb-flash 0.7s ease-out 1.6s both; }
+
+/* mano y botones */
+.lb-handbox { display: flex; flex-direction: column; gap: 0.5rem; }
+.lb-handtitle { display: flex; justify-content: space-between; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--lb-muted); font-weight: 700; }
+.lb-hand { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; padding-top: 0.8rem; }
+.lb-deal { animation: lb-deal 0.45s ease-out var(--d, 0s) both; }
+.lb-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.lb-actions button { border-radius: 0.8rem; padding: 0.85rem 0.5rem; font-weight: 700; color: var(--lb-ink); border-color: rgba(255, 255, 255, 0.25); }
+.lb-actions .lb-play:not(:disabled) { background: var(--lb-brass); border-color: var(--lb-brass); color: #1A0F12; }
+.lb-actions .lb-liar { border-color: var(--lb-red); color: #fff; background: var(--lb-red); letter-spacing: 0.06em; }
+.lb-actions .lb-liar:not(:disabled) { box-shadow: 0 0 14px rgba(229, 72, 59, 0.55); }
+.lb-rules summary { cursor: pointer; color: var(--lb-muted); font-size: 0.875rem; font-weight: 700; }
+.lb-rules .rules { margin-top: 0.5rem; color: var(--lb-muted); }
+#stage.lb-stage :focus-visible { outline-color: var(--lb-brass); }
+
+/* columna de jugadores */
+#players .lb-count { font-size: 0.8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+#players .lb-watch { font-size: 0.75rem; color: var(--muted); font-style: italic; }
+#players .lb-gun i { border-color: var(--gold); }
+#players .lb-gun i.lb-used { background: var(--muted); border-color: var(--muted); }
+
+@media (max-width: 30rem) {
+  .lb-card { --w: 3.5rem; }
+  .lb-card .lb-glyph { font-size: 1.55rem; }
+  .lb-felt { padding: 0.65rem; border-width: 6px; }
+  .lb-seats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@keyframes lb-fly { from { opacity: 0; transform: translate(-50%, 140%) rotate(-25deg) scale(1.3); } }
+@keyframes lb-deal { from { opacity: 0; transform: translateY(-30px) rotate(-8deg); } }
+@keyframes lb-flip { from { transform: rotateY(180deg); filter: brightness(0.3); } 50% { filter: brightness(0.6); } }
+@keyframes lb-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+@keyframes lb-stampin { from { opacity: 0; transform: rotate(-4deg) scale(2.2); } }
+@keyframes lb-fade { from { opacity: 0; } }
+@keyframes lb-pop { from { transform: scale(0.3); opacity: 0; } }
+@keyframes lb-spin { from { transform: rotate(-900deg); } }
+@keyframes lb-flash { 0% { box-shadow: inset 0 0 0 999px rgba(229, 72, 59, 0.55); } 100% { box-shadow: inset 0 0 0 999px rgba(229, 72, 59, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-fly, .lb-deal, .lb-flip.lb-anim .lb-card, .lb-caught, .lb-stamp.lb-late, p.lb-late, p.lb-late2, .lb-cyl, .lb-result, .lb-bcall, #stage.lb-stage:has(.lb-bang) { animation: none !important; }
+  .lb-seat, .lb-card { transition: none; }
+}

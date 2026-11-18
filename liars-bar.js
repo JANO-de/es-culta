@@ -1,23 +1,9 @@
 // =====================================================================================
-// Liars Bar · modo de cartas de faroleo para «¿Es culta?»
-//
-// Este archivo NO tiene conexión propia. Se engancha al mismo estado compartido G y al
-// mismo patrón que Cadena y Ruleta:
-//   1. Cada jugador publica su acción con pub({ act: {...} })  (room.presence de siempre).
-//   2. El anfitrión la lee en hostStep() -> lbStep() a través de roster().
-//   3. El anfitrión aplica las reglas sobre G.lb y publica G como siempre.
-//   4. Todos reciben G por evaluate() y pintan con lbView().
-//
-// Se carga ANTES del script principal y solo define funciones y variables con prefijo
-// lb/LB_, así que no choca con nada del código existente. Las funciones del script
-// principal (rng, esc, pname, timerHTML, pub, paint, G, pid…) se usan en tiempo de
-// llamada, cuando ya existen.
-//
-// Privacidad: las manos viajan dentro de G (hace falta para que otro jugador pueda
-// relevar al anfitrión si se cae). Van ofuscadas, NO cifradas: la interfaz solo
-// enseña tu mano, pero alguien que inspeccione el tráfico podría reconstruirlas.
-// De las cartas de la mesa solo se guarda la última jugada (la única que se puede
-// destapar); las anteriores se reducen a un contador.
+// Liars Bar · interfaz del modo de cartas. Las reglas viven en el servidor (engine.js):
+// aquí solo se pinta el estado que llega (G.lb) y se envían intenciones con send({ t: "lb" }).
+// Tu mano llega solo a ti (S.my.hand); las cartas de los demás y las jugadas anteriores
+// nunca salen del servidor, y las destapadas solo se ven tras «¡mentiroso!».
+// Se carga ANTES de app.js; usa en tiempo de llamada G, S, pid, send, esc, pname, timerHTML y paint.
 // =====================================================================================
 
 const LB_MAX = 4, LB_HAND = 5, LB_TURN = 20, LB_DEAL = 4, LB_REVEAL = 6, LB_SHOT = 5, LB_CHAMBERS = 6, LB_AWAY = 5;
@@ -35,129 +21,12 @@ let lbSel = [], lbSelKey = "", lbSent = -1, lbSeenSeq = -1, lbSeenRound = -1, lb
 // ---------- utilidades ----------
 const lbSeat = (lb, id) => (lb && lb.p.find((s) => s.id === id)) || null;
 const lbAlive = (lb) => lb.p.filter((s) => !s.out);
-function lbKey(g, id) {
-  let h = 0x2f6b;
-  for (const c of id + ":" + g.gid + ":" + g.r) h = (Math.imul(h, 31) + c.charCodeAt(0)) | 0;
-  return h;
-}
-// Ofuscación ligera (no es cifrado): evita que las cartas se lean a simple vista en el estado.
-function lbEnc(cards, g, id) {
-  const r = rng(lbKey(g, id));
-  return [...cards].map((c) => (LB_ABC.indexOf(c) + Math.floor(r() * 4)) % 4).join("");
-}
-function lbDec(str, g, id) {
-  const r = rng(lbKey(g, id));
-  return [...String(str || "")].map((d) => LB_ABC[(((Number(d) - Math.floor(r() * 4)) % 4) + 4) % 4]).join("");
-}
-function lbNextAfter(lb, id, needCards) {
-  const n = lb.p.length, i0 = lb.p.findIndex((s) => s.id === id);
-  for (let k = 1; k < n; k++) {
-    const s = lb.p[(i0 + k) % n];
-    if (!s.out && (!needCards || s.n > 0)) return s.id;
-  }
-  return null;
-}
-function lbFirstAlive(lb, id) {
-  const s = lbSeat(lb, id);
-  return s && !s.out ? id : lbNextAfter(lb, id, false);
-}
 // ¿Está obligado a destapar? Si no le quedan cartas, o si es el único que aún tiene.
 function lbMustCall(lb, s) {
   if (!lb.last || !s) return false;
   return s.n === 0 || lbAlive(lb).every((o) => o.id === s.id || o.n === 0);
 }
 const lbCanCall = (lb, s) => !!(lb.last && s && lb.last.id !== s.id);
-function lbValidPlay(g, s, cards) {
-  const lb = g.lb;
-  if (typeof cards !== "string" || cards.length < 1 || cards.length > 3 || !/^[KQAJ]+$/.test(cards)) return false;
-  if (lbMustCall(lb, s)) return false;
-  let hand = lbDec(s.h, g, s.id);
-  for (const c of cards) { const i = hand.indexOf(c); if (i < 0) return false; hand = hand.slice(0, i) + hand.slice(i + 1); }
-  return true;
-}
-
-// ---------- anfitrión ----------
-function lbStart(g, R) {
-  const seats = g.players.filter((p) => R.has(p.id)).slice(0, LB_MAX);
-  g.lb = { p: seats.map((p) => ({ id: p.id, h: "", n: 0, sh: 0, out: 0 })), table: "", last: null, pile: 0, seq: 0, call: null, round: 0 };
-  g.r = 0;
-  lbNewRound(g, seats[0].id);
-}
-function lbNewRound(g, starter) {
-  const lb = g.lb;
-  g.r += 1; lb.round += 1;
-  const deck = [];
-  for (const c of "KQA") for (let i = 0; i < 6; i++) deck.push(c);
-  deck.push("J", "J");
-  for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
-  lb.table = "KQA"[Math.floor(Math.random() * 3)];
-  for (const s of lb.p) {
-    if (s.out) { s.h = ""; s.n = 0; continue; }
-    const hand = deck.splice(0, LB_HAND).join("");
-    s.h = lbEnc(hand, g, s.id); s.n = hand.length;
-  }
-  lb.last = null; lb.pile = 0; lb.call = null; lb.seq += 1;
-  g.turn = lbFirstAlive(lb, starter);
-  g.phase = "lbdeal"; g.t = LB_DEAL;
-}
-function lbPlay(g, s, cards, auto) {
-  const lb = g.lb;
-  let hand = lbDec(s.h, g, s.id);
-  for (const c of cards) { const i = hand.indexOf(c); hand = hand.slice(0, i) + hand.slice(i + 1); }
-  s.h = lbEnc(hand, g, s.id); s.n = hand.length;
-  // solo se guarda la última jugada; las anteriores ya no se pueden destapar
-  lb.last = { id: s.id, n: cards.length, c: lbEnc(cards, g, "~" + s.id), auto: auto ? 1 : 0 };
-  lb.pile += cards.length; lb.seq += 1;
-  g.turn = lbNextAfter(lb, s.id, true) || lbNextAfter(lb, s.id, false);
-  g.phase = "lbturn"; g.t = LB_TURN;
-}
-function lbCall(g, s, auto) {
-  const lb = g.lb, on = lb.last.id, shown = lbDec(lb.last.c, g, "~" + on);
-  const lie = [...shown].some((c) => c !== lb.table && c !== "J");
-  lb.call = { by: s.id, on, shown, lie: lie ? 1 : 0, shooter: lie ? on : s.id, bang: -1, auto: auto ? 1 : 0 };
-  lb.seq += 1;
-  g.phase = "lbreveal"; g.t = LB_REVEAL;
-}
-function lbAuto(g, s) {
-  const lb = g.lb;
-  if (lbMustCall(lb, s) || s.n === 0) { if (lbCanCall(lb, s)) lbCall(g, s, true); return; }
-  const hand = lbDec(s.h, g, s.id);
-  lbPlay(g, s, [...hand].find((c) => c === lb.table || c === "J") || hand[0], true);
-}
-// Se llama desde hostStep() cuando G.mode === "liars". Una sola acción por paso, la del
-// jugador con el turno y con el número de secuencia actual: no puede haber dos turnos a la vez.
-function lbStep(g, R, isTick) {
-  const lb = g.lb;
-  if (!lb) { g.phase = "over"; g.win = []; g.t = 0; return; }
-  const down = () => isTick && --g.t <= 0;
-  if (g.phase === "lbdeal") {
-    if (down()) { g.phase = "lbturn"; g.t = LB_TURN; }
-  } else if (g.phase === "lbturn") {
-    const s = lbSeat(lb, g.turn);
-    if (!s || s.out) { g.turn = lbFirstAlive(lb, g.turn); return; }
-    const p = R.get(g.turn), a = p && p.act;
-    if (a && a.gid === g.gid && a.r === g.r && a.s === lb.seq) {
-      if (a.lb === "call" && lbCanCall(lb, s)) { lbCall(g, s, false); return; }
-      if (a.lb === "play" && lbValidPlay(g, s, a.c)) { lbPlay(g, s, a.c, false); return; }
-    }
-    if (!p && g.t > LB_AWAY) g.t = LB_AWAY;      // desconectado: no se espera el turno entero
-    if (down()) lbAuto(g, s);
-  } else if (g.phase === "lbreveal") {
-    if (down()) {
-      const sh = lbSeat(lb, lb.call.shooter);
-      lb.call.bang = Math.random() < 1 / Math.max(1, LB_CHAMBERS - sh.sh) ? 1 : 0;
-      g.phase = "lbshot"; g.t = LB_SHOT;
-    }
-  } else if (g.phase === "lbshot") {
-    if (down()) {
-      const sh = lbSeat(lb, lb.call.shooter);
-      sh.sh += 1; if (lb.call.bang) sh.out = 1;     // se aplica al final para no destripar el disparo
-      const alive = lbAlive(lb);
-      if (alive.length <= 1) { g.phase = "over"; g.t = 0; g.win = alive.map((x) => x.id); }
-      else lbNewRound(g, sh.id);
-    }
-  }
-}
 
 // ---------- pintar ----------
 const lbPl = (c, n) => (n === 1 ? LB_CARDS[c].n : LB_CARDS[c].pl);
@@ -179,7 +48,7 @@ function lbView(g) {
   const freshDeal = g.r !== lbSeenRound; lbSeenRound = g.r;
   const selKey = g.gid + "|" + g.r + "|" + lb.seq;
   if (selKey !== lbSelKey) { lbSel = []; lbSelKey = selKey; }
-  const hand = me && !me.out ? lbDec(me.h, g, pid) : "";
+  const hand = me && !me.out ? (S.my.hand || "") : "";
   lbSel = lbSel.filter((i) => i < hand.length);
   const myTurn = ph === "lbturn" && me && !me.out && g.turn === pid;
   const pending = lbSent === lb.seq;
@@ -239,7 +108,7 @@ function lbView(g) {
       <p class="lead">Nueva ronda: la carta de la mesa es <strong>${T.pl}</strong>. Abre ${who}.</p>`;
   } else if (ph === "lbturn") {
     head = `${timerHTML("Ronda " + lb.round + " · " + (myTurn ? "te toca" : "turno de " + who), LB_TURN)}`;
-    if (!me) foot = `<p class="muted">Estás mirando: Liars Bar se juega de 2 a 4. Podrás sentarte en la próxima partida.</p>`;
+    if (!me) foot = `<p class="muted">Estás mirando: Liars Bar se juega de 2 a 4 y podrás sentarte en la próxima partida.</p>`;
     else if (me.out) foot = `<p class="muted">Te han eliminado. Sigue la partida desde la barra.</p>`;
     else if (!myTurn) foot = `<p class="muted">${who} está decidiendo…</p>`;
     else if (pending) foot = `<p class="muted">Enviando tu jugada…</p>`;
@@ -292,7 +161,7 @@ function lbView(g) {
       <li>Cada uno tiene un revólver de 6 recámaras con una bala: cada disparo es más peligroso que el anterior. Si sale la bala, quedas eliminado.</li>
       <li>Tras cada disparo se reparte otra vez. Quien se queda sin cartas pasa; si eres el único que aún tiene, tienes que destapar. Gana el último en pie.</li>
       <li>${LB_TURN} s por turno: si se acaba el tiempo, se juega una carta por ti (o se destapa si estás obligado).</li>
-      <li>Tu mano solo aparece en tu pantalla, pero la mesa se sincroniza entre todos los dispositivos: no es un secreto a prueba de trampas.</li>
+      <li>Tu mano solo la conocen el servidor y tú: nadie puede ver las cartas de otro ni las jugadas anteriores.</li>
     </ul></details>`];
 }
 
@@ -316,7 +185,7 @@ function lbOverHTML(g) {
 // ---------- acciones del jugador: mismo pub({ act }) que los otros modos ----------
 document.getElementById("stage").addEventListener("click", (e) => {
   const b = e.target.closest("button");
-  if (!b || typeof G === "undefined" || !G || G.mode !== "liars" || G.phase !== "lbturn" || !G.lb || G.turn !== pid) return;
+  if (!b || !G || G.mode !== "liars" || G.phase !== "lbturn" || !G.lb || G.turn !== pid) return;
   const lb = G.lb, me = lbSeat(lb, pid);
   if (!me || me.out || lbSent === lb.seq) return;
   if (b.dataset.lbc !== undefined) {
@@ -324,13 +193,13 @@ document.getElementById("stage").addEventListener("click", (e) => {
     if (k >= 0) lbSel.splice(k, 1); else if (lbSel.length < 3) lbSel.push(i);
     paint();
   } else if (b.dataset.lba === "play" && lbSel.length) {
-    const hand = lbDec(me.h, G, pid), cards = lbSel.map((i) => hand[i]).join("");
+    const hand = S.my.hand || "", cards = lbSel.map((i) => hand[i]).join("");
     lbSent = lb.seq;
-    pub({ act: { gid: G.gid, r: G.r, s: lb.seq, lb: "play", c: cards } });
+    send({ t: "lb", a: "play", s: lb.seq, c: cards });
     paint();
   } else if (b.dataset.lba === "call" && lbCanCall(lb, me)) {
     lbSent = lb.seq;
-    pub({ act: { gid: G.gid, r: G.r, s: lb.seq, lb: "call" } });
+    send({ t: "lb", a: "call", s: lb.seq });
     paint();
   }
 });

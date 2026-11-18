@@ -4,30 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>¿Es culta?</title>
+<meta name="theme-color" content="#282828">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&display=swap">
 <style>
-/* Layout: una mesa de tertulia. Columna única (máx. 34rem): escenario de la ronda arriba,
-   jugadores y palabras debajo. La ruleta es una caja oscura en ambos temas. */
+/* Gruvbox. Oscuro por defecto; claro si el sistema lo pide o con el botón de tema. */
 :root {
-  --bg: #E7EFE8; --surface: #FAFCFA; --ink: #12241A; --muted: #566B5E; --line: #C3D2C7;
-  --felt: #1F5B3F; --on-felt: #F4FBF6; --yes: #17794A; --no: #B93226; --gold: #96690A;
-  --case-bg: #11161C; --case-tile: #1E2630; --case-ink: #F2F5F8; --case-mark: #F5C542;
+  --bg: #282828; --surface: #32302f; --ink: #ebdbb2; --muted: #a89984; --line: #504945;
+  --felt: #689d6a; --on-felt: #1d2021; --yes: #b8bb26; --no: #fb4934; --gold: #fabd2f; --blue: #83a598;
+  --case-bg: #1d2021; --case-tile: #3c3836; --case-ink: #ebdbb2; --case-mark: #fabd2f;
   --display: "Fraunces", Georgia, "Times New Roman", serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0F1F17; --surface: #16291F; --ink: #E6F0E9; --muted: #8FA898; --line: #2B4436;
-    --felt: #3FAE78; --on-felt: #08150E; --yes: #4CC48A; --no: #F0705F; --gold: #E0B040;
-    --case-bg: #080B0F; --case-tile: #18202A;
-    color-scheme: dark;
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #fbf1c7; --surface: #f2e5bc; --ink: #3c3836; --muted: #7c6f64; --line: #d5c4a1;
+    --felt: #427b58; --on-felt: #fbf1c7; --yes: #79740e; --no: #9d0006; --gold: #b57614; --blue: #076678;
+    --case-bg: #282828; --case-tile: #3c3836; --case-ink: #ebdbb2; color-scheme: light;
   }
 }
-:root[data-theme="dark"] {
-  --bg: #0F1F17; --surface: #16291F; --ink: #E6F0E9; --muted: #8FA898; --line: #2B4436;
-  --felt: #3FAE78; --on-felt: #08150E; --yes: #4CC48A; --no: #F0705F; --gold: #E0B040;
-  --case-bg: #080B0F; --case-tile: #18202A;
-  color-scheme: dark;
+:root[data-theme="light"] {
+  --bg: #fbf1c7; --surface: #f2e5bc; --ink: #3c3836; --muted: #7c6f64; --line: #d5c4a1;
+  --felt: #427b58; --on-felt: #fbf1c7; --yes: #79740e; --no: #9d0006; --gold: #b57614; --blue: #076678;
+  --case-bg: #282828; --case-tile: #3c3836; --case-ink: #ebdbb2; color-scheme: light;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -35,10 +39,11 @@ img { max-width: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 1rem; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 1.5rem 3rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top, 0px)); padding-bottom: max(3rem, env(safe-area-inset-bottom, 0px));
 }
 .wrap { max-width: 34rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.hbtns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 h1 { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 2rem; margin: 0; letter-spacing: -0.01em; }
 h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin: 0; font-weight: 700; }
 h3 { font-size: 1rem; margin: 0; }
@@ -51,7 +56,7 @@ button.small { padding: 0.3rem 0.8rem; font-size: 0.875rem; }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 input[type="text"], select { min-width: 0; border: 1.5px solid var(--line); background: var(--bg); border-radius: 0.6rem; padding: 0.6rem 0.8rem; }
 input[type="text"] { width: 100%; }
-#linkBox { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.875rem; color: var(--muted); }
+.banner { background: var(--gold); color: #1d2021; border-radius: 0.6rem; padding: 0.4rem 0.8rem; font-size: 0.875rem; font-weight: 700; }
 
 #stage { background: var(--surface); border: 1.5px solid var(--line); border-radius: 1rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; min-height: 15rem; }
 .row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
@@ -63,6 +68,7 @@ input[type="text"] { width: 100%; }
 .lead { font-size: 1.125rem; text-wrap: balance; }
 .muted { color: var(--muted); }
 .err { color: var(--no); font-size: 0.875rem; min-height: 1.3em; }
+.specnote { border-left: 4px solid var(--blue); padding: 0.3rem 0 0.3rem 0.75rem; color: var(--muted); font-size: 0.9375rem; }
 .letter { font-family: var(--display); font-size: 4rem; line-height: 1; color: var(--felt); }
 .lemma { font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 11vw, 3.25rem); line-height: 1.05; overflow-wrap: anywhere; }
 .lemma b, .chain b { color: var(--gold); font-weight: inherit; }
@@ -71,8 +77,8 @@ input[type="text"] { width: 100%; }
 .votes button { padding: 0.9rem 0.5rem; font-weight: 700; border-radius: 0.8rem; }
 .votes .y { border-color: var(--yes); color: var(--yes); }
 .votes .n { border-color: var(--no); color: var(--no); }
-.votes .y[aria-pressed="true"] { background: var(--yes); color: var(--surface); }
-.votes .n[aria-pressed="true"] { background: var(--no); color: var(--surface); }
+.votes .y[aria-pressed="true"] { background: var(--yes); color: var(--bg); }
+.votes .n[aria-pressed="true"] { background: var(--no); color: var(--bg); }
 .stamp { align-self: flex-start; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border: 3px solid currentColor; border-radius: 0.4rem; padding: 0.2rem 0.7rem; transform: rotate(-3deg); }
 .stamp.y { color: var(--yes); } .stamp.n { color: var(--no); }
 .falta { border-left: 4px solid var(--gold); padding: 0.4rem 0 0.4rem 0.75rem; }
@@ -85,6 +91,20 @@ ul { list-style: none; margin: 0; padding: 0; }
 .mode p { font-size: 0.9375rem; color: var(--muted); flex: 1; }
 .mode button { align-self: flex-start; }
 @media (max-width: 30rem) { .modes { grid-template-columns: 1fr; } }
+
+/* avatares */
+.av { position: relative; display: inline-grid; place-items: center; width: var(--s, 32px); height: var(--s, 32px); border-radius: 50%; background: var(--c); color: #1d2021;
+  font-family: var(--display); font-weight: 600; font-size: calc(var(--s, 32px) * 0.45); overflow: hidden; flex: 0 0 auto; }
+.av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* inicio */
+.homehead { display: flex; gap: 0.9rem; align-items: center; }
+.avpick { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; font-size: 0.75rem; color: var(--muted); }
+.homeacts { display: grid; gap: 0.6rem; }
+.codebox { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.codebig { font-family: var(--display); font-weight: 600; font-size: 2rem; letter-spacing: 0.18em; color: var(--gold); }
+#codeInput { text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; }
+.rk { width: 1.5rem; font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 700; }
 
 /* ---- ruleta tipo caja ---- */
 .case { position: relative; overflow: hidden; height: 7rem; background: var(--case-bg); border-radius: 0.8rem; }
@@ -100,17 +120,16 @@ ul { list-style: none; margin: 0; padding: 0; }
 .rar { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   padding: 0.1rem 0.55rem; border-radius: 999px; color: #fff; background: var(--rc); vertical-align: middle; }
 .letterline { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
-
 .opts { display: flex; flex-direction: column; gap: 0.5rem; }
 .opts button { border-radius: 0.7rem; text-align: left; padding: 0.7rem 0.9rem; font-family: var(--display); font-size: 1.25rem; font-weight: 600; overflow-wrap: anywhere; }
 .opts button[aria-pressed="true"] { background: var(--felt); border-color: var(--felt); color: var(--on-felt); }
 .opts .own { font-family: var(--body); font-size: 0.8125rem; font-weight: 400; margin-left: 0.4rem; }
-.results li { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+.results li { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
 .results .w { font-family: var(--display); font-weight: 600; font-size: 1.25rem; flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.results .by { font-size: 0.875rem; color: var(--muted); }
+.results .by { font-size: 0.875rem; color: var(--muted); font-family: var(--body); font-weight: 400; }
 .results .n { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 4.5rem; text-align: right; }
 .results .win .w { color: var(--gold); }
-.results .win .n::after { content: " · +1"; color: var(--yes); }
+.results.pr .win .n::after { content: " · +1"; color: var(--yes); }
 
 section { display: flex; flex-direction: column; gap: 0.6rem; }
 #players li { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); }
@@ -127,6 +146,33 @@ section { display: flex; flex-direction: column; gap: 0.6rem; }
 .chain { font-family: var(--display); font-size: 1.125rem; display: flex; flex-wrap: wrap; gap: 0.2rem 0.5rem; }
 .chain.arrows span + span::before { content: "→ "; color: var(--muted); }
 .chain:not(.arrows) span + span::before { content: "· "; color: var(--muted); }
+
+/* blackjack */
+.bjrow { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+.bjrow .who { display: flex; align-items: center; gap: 0.5rem; min-width: 7rem; font-weight: 700; }
+.bjcards { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.bj-card { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 2.6rem; height: 3.6rem; border-radius: 0.4rem;
+  background: #fbf1c7; color: #282828; border: 1.5px solid #bdae93; font-family: var(--display); line-height: 1.05; box-shadow: 0 2px 5px rgba(0,0,0,.35); }
+.bj-card b { font-size: 1.05rem; } .bj-card i { font-style: normal; font-size: 1.1rem; }
+.bj-card.red { color: #9d0006; }
+.bj-card.bj-back { background: repeating-linear-gradient(45deg, #9d0006 0 5px, #6e0004 5px 10px); border-color: #fbf1c7; }
+.bjsc { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); }
+.bjst { margin-left: auto; font-size: 0.8125rem; font-weight: 700; }
+.bjst.win, .bjst.bj { color: var(--yes); } .bjst.lose, .bjst.bust { color: var(--no); } .bjst.push { color: var(--muted); }
+.bjdealer { background: var(--bg); border-radius: 0.8rem; padding: 0.6rem 0.8rem; }
+
+/* pistolero */
+.duel { display: grid; place-items: center; gap: 0.4rem; padding: 1.2rem 0; text-align: center; border-radius: 0.8rem; background: var(--bg); }
+.duelbig { font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 12vw, 3.5rem); line-height: 1; }
+.duel.go { background: var(--yes); color: #1d2021; }
+.duel.go .muted { color: #1d2021; }
+.duelbtn { width: 100%; padding: 1.4rem 0.5rem; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.08em; border-radius: 1rem; border-color: var(--no); color: var(--no); touch-action: manipulation; }
+.duelbtn.go { background: var(--no); color: #fff; }
+
+/* chat */
+.chatlog { max-height: 12rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9375rem; padding: 0.5rem 0.7rem; border: 1.5px solid var(--line); border-radius: 0.8rem; background: var(--surface); }
+.chatlog b { color: var(--gold); font-weight: 700; margin-right: 0.35rem; }
+.chatlog p { overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
 </style>
 <link rel="stylesheet" href="liars-bar.css">
@@ -136,12 +182,13 @@ section { display: flex; flex-direction: column; gap: 0.6rem; }
 <div class="wrap">
   <header>
     <h1>¿Es culta?</h1>
-    <button class="small" id="copyBtn" type="button">Copiar enlace para invitar</button>
+    <div class="hbtns">
+      <button class="small" id="themeBtn" type="button" aria-label="Cambiar tema">◐ Tema</button>
+      <button class="small" id="codeBtn" type="button" hidden></button>
+      <button class="small" id="leaveBtn" type="button" hidden>Salir</button>
+    </div>
   </header>
-  <div id="linkBox" hidden>
-    <label for="linkField">Copia este enlace y envíaselo a tus amigos:</label>
-    <input type="text" id="linkField" readonly>
-  </div>
+  <div id="banner" class="banner" hidden></div>
 
   <div id="stage" aria-live="polite"></div>
 
@@ -154,547 +201,18 @@ section { display: flex; flex-direction: column; gap: 0.6rem; }
     <h2 id="chainTitle">Cadena de palabras</h2>
     <div class="chain" id="chain"></div>
   </section>
+
+  <section id="chatSec" hidden>
+    <h2>Chat</h2>
+    <div class="chatlog" id="chatLog" aria-live="polite"></div>
+    <form id="chatForm" class="row">
+      <input type="text" id="chatInput" maxlength="200" autocomplete="off" placeholder="Escribe un mensaje" aria-label="Mensaje">
+      <button class="small primary" type="submit">Enviar</button>
+    </form>
+  </section>
 </div>
 
 <script src="liars-bar.js"></script>
-<script>
-// Cada mesa es un código en el enlace (#abc123). Quien abre el mismo enlace entra en la misma mesa.
-let CODE = (location.hash.slice(1).match(/^[a-z0-9]{4,12}$/) || [])[0];
-if (!CODE) { CODE = Math.random().toString(36).slice(2, 8).padEnd(6, "0"); try { history.replaceState(null, "", "#" + CODE); } catch { location.hash = CODE; } }
-addEventListener("hashchange", () => location.reload());
-const INVITE_URL = location.href.split("#")[0] + "#" + CODE;
-// La mesa se sincroniza con el servidor del sitio (POST /sync), que guarda el estado de cada
-// jugador en la base de datos y devuelve el de toda la mesa. Cada jugador envía su estado cada
-// segundo y cuando cambia; si la red falla, lo vuelve a intentar solo.
-
-const ROUND = 15, REVEAL = 5, LIVES = 3, MAX_PLAYERS = 12, SPIN = 7, SPIN_MS = 5200;
-const RARITY = [
-  { n: "Común", c: "#4B69FF", w: 5, L: "ACELMPRST" },
-  { n: "Poco común", c: "#8847FF", w: 4, L: "BDFINO" },
-  { n: "Rara", c: "#D32CE6", w: 3, L: "GHUV" },
-  { n: "Muy rara", c: "#EB4B4B", w: 2, L: "JYZ" },
-  { n: "Legendaria", c: "#E4AE39", w: 1, L: "ÑQX" },
-];
-const rarityOf = (l) => RARITY.find((r) => r.L.includes(String(l).toUpperCase())) || RARITY[0];
-
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
-};
-let pid = store.get("culta.pid");
-if (!pid) { pid = Math.random().toString(36).slice(2, 10); store.set("culta.pid", pid); }
-
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const clone = (o) => JSON.parse(JSON.stringify(o));
-
-// ---------- reglas de palabras ----------
-const norm = (w) => String(w).trim().toLowerCase().replace(/ñ/g, "\u0001").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\u0001/g, "ñ");
-const lastLetter = (w) => norm(w).slice(-1);
-function wordError(word, g) {
-  const n = norm(word);
-  if (!/^[a-zñ]{2,24}$/.test(n)) return "Escribe una sola palabra, solo con letras.";
-  if (g.letter && n[0] !== g.letter) return "Tiene que empezar por «" + g.letter.toUpperCase() + "».";
-  if ((g.hist || []).some((h) => norm(h) === n)) return "Esa palabra ya ha salido en esta partida.";
-  return null;
-}
-
-// ---------- azar de la ruleta ----------
-function rng(seed) {
-  let a = seed >>> 0;
-  return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-}
-function weightedLetter(rand, used) {
-  const pool = [];
-  for (const r of RARITY) for (const l of r.L) if (!used || !used.includes(l.toLowerCase())) pool.push([l, r.w]);
-  if (!pool.length) return weightedLetter(rand, null);
-  let x = rand() * pool.reduce((s, p) => s + p[1], 0);
-  for (const [l, w] of pool) { if ((x -= w) < 0) return l.toLowerCase(); }
-  return pool[0][0].toLowerCase();
-}
-
-// ---------- estado ----------
-let room = null, status = "connecting";      // connecting | ready | off
-let joined = false, myName = (store.get("culta.name") || "").slice(0, 16);
-let peers = [], G = null, amHost = false;
-let lastSig = "", lastChange = Date.now(), noGSince = Date.now(), lastTick = Date.now(), lastPub = "";
-let myVote = null, myPick = null, mySent = null, askedGo = 0, askedAgain = 0, roundsPick = 5;
-
-const pub = (patch) => { if (room) room.presence(patch); };
-
-function roster() {
-  const m = new Map();
-  for (const p of peers) {
-    const pr = p.presence || {};
-    if (typeof pr.pid !== "string" || typeof pr.name !== "string" || !pr.name.trim()) continue;
-    const id = pr.pid.slice(0, 16);
-    if (!m.has(id)) m.set(id, { name: pr.name.trim().slice(0, 16), act: (pr.act && typeof pr.act === "object") ? pr.act : {} });
-  }
-  return m;
-}
-function pickG() {
-  let best = null;
-  for (const p of peers) {
-    const g = p.presence && p.presence.g;
-    if (!g || typeof g !== "object" || typeof g.ep !== "number" || typeof g.host !== "string" || !Array.isArray(g.players)) continue;
-    if (!best || g.ep > best.ep || (g.ep === best.ep && g.host < best.host)) best = g;
-  }
-  return best;
-}
-const freshGame = (gid) => ({ ep: 0, host: pid, hb: 0, gid: gid || 1, mode: "chain", total: 5, phase: "lobby", r: 0, t: 0, turn: "", letter: "", word: "",
-  players: [], hist: [], used: [], yes: 0, no: 0, voted: 0, res: "", lost: false, rep: 0, falta: 0, win: [], spin: 0, props: [], tally: [], wi: [], subs: 0 });
-function saveG() { if (G) store.set("culta.g." + CODE, JSON.stringify({ at: Date.now(), g: G })); }
-function loadG() {
-  try { const s = JSON.parse(store.get("culta.g." + CODE) || "null"); if (s && Date.now() - s.at < 120000 && s.g && Array.isArray(s.g.players)) return s.g; } catch {}
-  return null;
-}
-
-function evaluate() {
-  const best = pickG(), now = Date.now();
-  if (amHost) {
-    if (best && best.host !== pid && (best.ep > G.ep || (best.ep === G.ep && best.host < pid))) {
-      amHost = false; pub({ g: null }); G = best;
-    } else { hostStep(false); return; }
-  }
-  if (best) {
-    const sig = [best.ep, best.host, best.hb, best.phase, best.r, best.t].join("|");
-    if (sig !== lastSig) { lastSig = sig; lastChange = now; }
-    G = best; noGSince = null; saveG();
-  } else if (noGSince === null) noGSince = now;
-  paint();
-}
-
-function tick() {
-  const now = Date.now();
-  if (now - lastTick > 2500) { lastChange = now; if (noGSince !== null) noGSince = now; } // esta pestaña estuvo dormida
-  lastTick = now;
-  if (amHost) hostStep(true);
-  else if (joined && room) {
-    const best = pickG();
-    const missing = !best && noGSince !== null && now - noGSince > 3000;
-    const stalled = !!best && now - lastChange > 7000;
-    if (missing || stalled) {
-      const ids = [...roster().keys()].filter((id) => !(stalled && id === best.host)).sort();
-      if (ids[0] === pid) becomeHost();
-    }
-  }
-  paint();
-}
-
-// ---------- anfitrión: lleva la partida ----------
-function becomeHost() {
-  const base = Object.assign(freshGame(), G ? clone(G) : (loadG() || {}));
-  base.ep = (base.ep || 0) + 1; base.host = pid; base.hb = 0;
-  G = base; amHost = true; lastPub = "";
-  hostStep(false);
-}
-// modo cadena
-function toReveal(g, res, lost) {
-  g.phase = "reveal"; g.t = REVEAL; g.res = res; g.lost = lost; g.falta = 0;
-  const p = g.players.find((x) => x.id === g.turn); if (!p) return;
-  if (lost) p.lives = Math.max(0, p.lives - 1);
-  if (g.rep) {
-    p.f = (p.f || 0) + 1;
-    if (p.f >= 2) { p.f = 0; p.lives = Math.max(0, p.lives - 1); g.falta = 2; } else g.falta = 1;
-  }
-}
-function nextRound(g) {
-  if (g.word) { g.hist.push(g.word); if (g.hist.length > 40) g.hist.shift(); g.letter = lastLetter(g.word); }
-  g.word = ""; g.yes = g.no = g.voted = 0; g.res = ""; g.lost = false; g.rep = 0; g.falta = 0;
-  const alive = g.players.filter((p) => p.lives > 0);
-  if (alive.length <= 1) { g.phase = "over"; g.win = alive.map((p) => p.id); g.t = 0; return; }
-  const n = g.players.length; let i = g.players.findIndex((p) => p.id === g.turn);
-  do { i = (i + 1) % n; } while (g.players[i].lives <= 0);
-  g.turn = g.players[i].id; g.r += 1; g.phase = "write"; g.t = ROUND;
-}
-// modo ruleta
-function spinRound(g) {
-  g.letter = weightedLetter(Math.random, g.used); g.used.push(g.letter);
-  g.spin = Math.floor(Math.random() * 1e9); g.phase = "spin"; g.t = SPIN;
-  g.props = []; g.tally = []; g.wi = []; g.voted = 0; g.subs = 0;
-}
-function finishRoul(g, idxs) {
-  g.phase = "reveal"; g.t = REVEAL + 2; g.wi = idxs;
-  for (const i of idxs) {
-    const p = g.players.find((x) => x.id === g.props[i].id); if (p) p.pts = (p.pts || 0) + 1;
-    g.hist.push(g.props[i].w); if (g.hist.length > 40) g.hist.shift();
-  }
-}
-function hostStep(isTick) {
-  const g = G, R = roster();
-  if (isTick) g.hb = (g.hb + 1) % 1e6;
-  if (g.phase === "lobby") g.players = g.players.filter((p) => R.has(p.id));
-  if (g.phase !== "over") {
-    for (const [id, p] of R) {
-      const ex = g.players.find((x) => x.id === id);
-      if (ex) ex.name = p.name;
-      else if (g.players.length < MAX_PLAYERS) g.players.push({ id, name: p.name, lives: LIVES, f: 0, pts: 0 });
-    }
-  }
-  const mine = (a) => a && a.gid === g.gid;
-  const tickDown = () => isTick && --g.t <= 0;
-  if (g.phase === "lobby") {
-    const go = [...R.values()].find((p) => mine(p.act) && p.act.go === 1);
-    if (g.players.length >= 2 && go) {
-      g.mode = go.act.mode === "roul" ? "roul" : go.act.mode === "liars" ? "liars" : "chain";
-      g.total = Math.min(15, Math.max(1, parseInt(go.act.n, 10) || 5));
-      g.players.forEach((p) => { p.lives = LIVES; p.f = 0; p.pts = 0; });
-      g.hist = []; g.used = []; g.letter = ""; g.word = ""; g.win = []; g.r = 1;
-      if (g.mode === "roul") spinRound(g);
-      else if (g.mode === "liars") lbStart(g, R);   // Liars Bar (liars-bar.js)
-      else { g.turn = g.players[0].id; g.phase = "write"; g.t = ROUND; g.rep = 0; }
-    }
-  } else if (g.phase === "over") {
-    if ([...R.values()].some((p) => mine(p.act) && p.act.again === 1)) { const ep = g.ep, hb = g.hb; G = freshGame(g.gid + 1); G.ep = ep; G.hb = hb; hostStep(false); return; }
-  } else if (g.mode === "liars") {
-    lbStep(g, R, isTick);   // Liars Bar (liars-bar.js)
-  } else if (g.mode === "chain") {
-    if (g.phase === "write") {
-      const a = R.get(g.turn) && R.get(g.turn).act;
-      if (mine(a) && a.r === g.r && typeof a.word === "string" && !wordError(a.word, g)) {
-        g.word = a.word.trim().toLowerCase().slice(0, 24); g.phase = "vote"; g.t = ROUND; g.voted = 0;
-        g.rep = g.letter && lastLetter(g.word) === g.letter ? 1 : 0;   // la letra se repetiría: falta
-      } else if (tickDown()) toReveal(g, "timeout", true);
-    } else if (g.phase === "vote") {
-      let yes = 0, no = 0, eligible = 0;
-      for (const [id, p] of R) {
-        if (id === g.turn) continue;
-        eligible++;
-        if (mine(p.act) && p.act.r === g.r) { if (p.act.vote === 1) yes++; else if (p.act.vote === 0) no++; }
-      }
-      g.voted = yes + no;
-      if ((eligible > 0 && g.voted >= eligible) || tickDown()) { g.yes = yes; g.no = no; toReveal(g, "vote", no > yes); }
-    } else if (g.phase === "reveal") {
-      if (tickDown()) nextRound(g);
-    }
-  } else {
-    if (g.phase === "spin") {
-      if (tickDown()) { g.phase = "write"; g.t = ROUND; g.props = []; g.subs = 0; }
-    } else if (g.phase === "write") {
-      const present = g.players.filter((p) => R.has(p.id)), props = [];
-      for (const p of present) {
-        const a = R.get(p.id).act;
-        if (mine(a) && a.r === g.r && typeof a.word === "string" && !wordError(a.word, g)) props.push({ id: p.id, w: a.word.trim().toLowerCase().slice(0, 24) });
-      }
-      g.subs = props.length;
-      if ((present.length > 0 && props.length >= present.length) || tickDown()) {
-        for (let i = props.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [props[i], props[j]] = [props[j], props[i]]; }
-        g.props = props; g.tally = props.map(() => 0); g.subs = 0; g.voted = 0;
-        if (props.length < 2) { g.res = props.length ? "solo" : "none"; finishRoul(g, props.length ? [0] : []); }
-        else { g.res = "vote"; g.phase = "vote"; g.t = ROUND; }
-      }
-    } else if (g.phase === "vote") {
-      const tally = g.props.map(() => 0); let voted = 0, eligible = 0;
-      for (const [id, p] of R) {
-        eligible++;
-        const a = p.act;
-        if (mine(a) && a.r === g.r && Number.isInteger(a.pick) && g.props[a.pick] && g.props[a.pick].id !== id) { tally[a.pick]++; voted++; }
-      }
-      g.voted = voted;
-      if ((eligible > 0 && voted >= eligible) || tickDown()) {
-        g.tally = tally; const max = Math.max(...tally);
-        finishRoul(g, max > 0 ? tally.map((v, i) => (v === max ? i : -1)).filter((i) => i >= 0) : []);
-      }
-    } else if (g.phase === "reveal") {
-      if (tickDown()) {
-        if (g.r >= g.total) {
-          const max = Math.max(...g.players.map((p) => p.pts || 0));
-          g.phase = "over"; g.t = 0; g.win = max > 0 ? g.players.filter((p) => (p.pts || 0) === max).map((p) => p.id) : [];
-        } else { g.r += 1; spinRound(g); }
-      }
-    }
-  }
-  const js = JSON.stringify(G);
-  if (js !== lastPub) { lastPub = js; pub({ g: JSON.parse(js) }); saveG(); paint(); }
-}
-
-// ---------- pintar ----------
-const pname = (id) => { const p = G && G.players.find((x) => x.id === id); return p ? p.name : "Alguien"; };
-const lemma = (w) => esc(w.slice(0, -1)) + "<b>" + esc(w.slice(-1)) + "</b>";
-const RULES = `<ul class="rules">
-  <li><strong>Cadena:</strong> por turnos, cada jugador escribe una palabra en 15 segundos que empiece por la última letra de la anterior. Los demás votan si es culta; si gana el no, pierde una vida.</li>
-  <li>Si tu palabra acaba en la misma letra con la que empieza, la siguiente repetiría letra y te llevas una falta. Dos faltas, una vida menos. Quedarse sin escribir también cuesta una vida.</li>
-  <li><strong>Liars Bar:</strong> de 2 a 4 jugadores. Juras que tus cartas boca abajo son la carta de la mesa; si alguien te grita «¡mentiroso!» y te pilla, te toca el revólver. Gana el último en pie.</li>
-  <li><strong>Ruleta:</strong> la ruleta saca una letra, todos escriben su propuesta a la vez y luego se vota la más culta. La ganadora suma un punto. Tras las rondas elegidas, gana quien más puntos tenga.</li>
-</ul>`;
-const timerHTML = (label, max) => `<div><div class="meta"><span>${label}</span><span><span id="tnum">${G.t}</span> s</span></div>
-  <div class="bar" id="bar" data-max="${max || ROUND}"><i style="width:${(G.t / (max || ROUND)) * 100}%"></i></div></div>`;
-const rarTag = (l) => { const r = rarityOf(l); return `<span class="rar" style="--rc:${r.c}">${r.n}</span>`; };
-
-function lobbyView(g) {
-  const n = g.players.length, asked = askedGo === g.gid, ok = n >= 2 && !asked;
-  const opts = [3, 5, 8, 10].map((v) => `<option value="${v}" ${v === roundsPick ? "selected" : ""}>${v} rondas</option>`).join("");
-  return ["lobby|" + g.gid + "|" + (n >= 2) + "|" + asked, `<p class="lead">${asked ? "Empezando…" : n >= 2 ? "Todo listo. Cualquiera puede elegir modo y empezar." : "Esperando a que llegue alguien más."}</p>
-    ${n >= 2 ? "" : '<p class="muted">Hacen falta al menos 2 jugadores. Pulsa «Copiar enlace para invitar» y pásaselo a tus amigos.</p>'}
-    <div class="modes">
-      <div class="mode"><h3>Cadena</h3><p>Por turnos y con 3 vidas. Cada palabra empieza por la última letra de la anterior.</p>
-        <button class="primary" type="button" data-go="chain" ${ok ? "" : "disabled"}>Jugar cadena</button></div>
-      <div class="mode"><h3>Ruleta</h3><p>Letra al azar, todos escriben a la vez y gana la propuesta más culta.</p>
-        <select id="roundsSel" aria-label="Número de rondas">${opts}</select>
-        <button class="primary" type="button" data-go="roul" ${ok ? "" : "disabled"}>Jugar ruleta</button></div>
-      <div class="mode lb-mode"><h3>Liars Bar</h3><p>De 2 a 4 jugadores. Cartas boca abajo, faroles, «¡mentiroso!» y un revólver de seis recámaras.${n > 4 ? " Juegan los 4 primeros; el resto mira." : ""}</p>
-        <button class="primary" type="button" data-go="liars" ${ok ? "" : "disabled"}>Jugar Liars Bar</button></div>
-    </div>${RULES}`];
-}
-
-function chainView(g) {
-  const myTurn = g.turn === pid, who = esc(pname(g.turn)), L = g.letter ? g.letter.toUpperCase() : "";
-  if (g.phase === "write") {
-    const key = ["write", g.gid, g.r, myTurn].join("|");
-    if (myTurn) return [key, `${timerHTML("Ronda " + g.r + " · te toca escribir")}
-      ${L ? `<p class="lead">Escribe una palabra que empiece por</p><div class="letter">${esc(L)}</div>
-        <p class="muted">Si también acaba en ${esc(L)}, te llevas una falta.</p>` : '<p class="lead">Abres la partida: escribe la palabra que quieras.</p>'}
-      <form id="wordForm" class="row"><input type="text" id="wordInput" maxlength="24" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Tu palabra">
-      <button class="primary" type="submit">Enviar</button></form><p class="err" id="wordErr"></p>`];
-    return [key, `${timerHTML("Ronda " + g.r)}
-      <p class="lead">${who} está pensando una palabra${L ? " que empiece por" : ""}…</p>${L ? `<div class="letter">${esc(L)}</div>` : ""}`];
-  }
-  if (g.phase === "vote") {
-    const v = myVote && myVote.gid === g.gid && myVote.r === g.r ? myVote.v : null;
-    const key = ["vote", g.gid, g.r, myTurn, v].join("|");
-    const head = `${timerHTML("Ronda " + g.r + " · votación")}<div><div class="lemma">${lemma(g.word)}</div><p class="gloss">palabra propuesta por ${who}</p></div>`;
-    if (myTurn) return [key, head + `<p class="lead">Los demás están votando si es culta.</p><p class="muted">Votos emitidos: <span id="voted">${g.voted}</span></p>`];
-    return [key, head + `<div class="votes"><button class="y" type="button" data-v="1" aria-pressed="${v === 1}">Es culta</button>
-      <button class="n" type="button" data-v="0" aria-pressed="${v === 0}">No es culta</button></div>
-      <p class="muted">${v === null ? "Elige antes de que acabe el tiempo." : "Voto registrado. Puedes cambiarlo mientras quede tiempo."} Votos emitidos: <span id="voted">${g.voted}</span></p>`];
-  }
-  // reveal
-  const p = g.players.find((x) => x.id === g.turn), outNow = p && p.lives <= 0;
-  const lifeMsg = g.lost ? `${who} pierde una vida.` : g.res === "vote" ? `${who} conserva sus vidas por la votación.` : "";
-  const faltaMsg = g.falta === 1 ? `Falta para ${who} por repetir la ${esc(L)}. A la segunda falta, pierde una vida.`
-    : g.falta === 2 ? `Segunda falta para ${who} por repetir la ${esc(L)}: pierde una vida.` : "";
-  const tail = `${lifeMsg ? `<p>${lifeMsg}</p>` : ""}${faltaMsg ? `<p class="falta">${faltaMsg}</p>` : ""}${outNow ? `<p><strong>${who} se queda sin vidas y cae eliminado.</strong></p>` : ""}`;
-  const key = "reveal|" + g.gid + "|" + g.r;
-  if (g.res === "timeout") return [key, `<p class="lead">Se acabó el tiempo y no hay palabra.</p>${tail}`];
-  return [key, `<div><div class="lemma">${lemma(g.word)}</div><p class="gloss">palabra propuesta por ${who}</p></div>
-    <div class="stamp ${g.lost ? "n" : "y"}">${g.lost ? "No es culta" : "Culta"}</div>
-    <p>${g.yes} ${g.yes === 1 ? "voto" : "votos"} a favor · ${g.no} en contra${g.yes === g.no ? " · el empate salva la palabra" : ""}</p>${tail}`];
-}
-
-function roulView(g) {
-  const L = g.letter.toUpperCase(), label = "Ronda " + g.r + " de " + g.total;
-  if (g.phase === "spin") return ["spin|" + g.gid + "|" + g.r, `<div class="meta"><span>${label} · ruleta</span></div>
-    <div class="case" id="case"><div class="strip" id="strip"></div></div>
-    <p class="lead" id="spinRes">Girando la ruleta…</p>`];
-  if (g.phase === "write") {
-    return ["rwrite|" + g.gid + "|" + g.r, `${timerHTML(label + " · todos escriben")}
-      <div class="letterline"><div class="letter">${esc(L)}</div>${rarTag(L)}</div>
-      <p class="lead">Escribe la palabra más culta que se te ocurra con la ${esc(L)}.</p>
-      <form id="wordForm" class="row"><input type="text" id="wordInput" maxlength="24" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Tu propuesta">
-      <button class="primary" type="submit">Enviar</button></form><p class="err" id="wordErr"></p><p class="muted" id="subInfo"></p>`];
-  }
-  if (g.phase === "vote") {
-    const pick = myPick && myPick.gid === g.gid && myPick.r === g.r ? myPick.i : null;
-    const list = g.props.map((p, i) => p.id === pid
-      ? `<button type="button" disabled>${esc(p.w)}<span class="own">tu propuesta</span></button>`
-      : `<button type="button" data-pick="${i}" aria-pressed="${pick === i}">${esc(p.w)}</button>`).join("");
-    return ["rvote|" + g.gid + "|" + g.r + "|" + pick, `${timerHTML(label + " · votación")}
-      <p class="lead">¿Cuál es la más culta? No puedes votar la tuya.</p><div class="opts">${list}</div>
-      <p class="muted">${pick === null ? "Elige antes de que acabe el tiempo." : "Voto registrado. Puedes cambiarlo mientras quede tiempo."} Votos emitidos: <span id="voted">${g.voted}</span></p>`];
-  }
-  // reveal
-  const key = "rreveal|" + g.gid + "|" + g.r;
-  if (g.res === "none") return [key, `<div class="letterline"><div class="letter">${esc(L)}</div>${rarTag(L)}</div><p class="lead">Nadie escribió una palabra válida. Esta ronda no suma puntos.</p>`];
-  const order = g.props.map((p, i) => i).sort((a, b) => (g.tally[b] || 0) - (g.tally[a] || 0));
-  const rows = order.map((i) => { const p = g.props[i], n = g.tally[i] || 0;
-    return `<li class="${g.wi.includes(i) ? "win" : ""}"><span class="w">${esc(p.w)} <span class="by">de ${esc(pname(p.id))}</span></span><span class="n">${g.res === "solo" ? "sin rival" : n + (n === 1 ? " voto" : " votos")}</span></li>`; }).join("");
-  const head = g.res === "solo" ? "Solo hubo una propuesta: gana sin votación."
-    : g.wi.length === 0 ? "Nadie votó. Esta ronda no suma puntos."
-    : g.wi.length > 1 ? "Empate: todas las más votadas suman un punto." : `Gana la propuesta de ${esc(pname(g.props[g.wi[0]].id))}.`;
-  return [key, `<div class="letterline"><div class="letter">${esc(L)}</div>${rarTag(L)}</div><p class="lead">${head}</p><ul class="results">${rows}</ul>`];
-}
-
-function stageView() {
-  if (status === "off") return ["off", `<p class="lead">No se puede conectar con la mesa.</p>
-    <p class="muted">Comprueba tu conexión a internet. La página lo sigue intentando sola; si no vuelve en unos segundos, recárgala.</p>${RULES}`];
-  if (!joined) return ["join", `<p class="lead">Siéntate a la mesa</p>
-    <form id="joinForm" class="row"><input type="text" id="nameInput" maxlength="16" autocomplete="off" placeholder="Tu nombre" aria-label="Tu nombre">
-    <button class="primary" type="submit" ${status === "ready" ? "" : "disabled"}>Entrar</button></form>
-    <p class="muted" id="joinNote"></p>${RULES}`];
-  if (!G) return ["wait", `<p class="lead">Preparando la mesa…</p>${RULES}`];
-  const g = G;
-  if (g.phase === "lobby") return lobbyView(g);
-  if (g.phase === "over") {
-    const asked = askedAgain === g.gid, w = g.win || [];
-    const title = w.length === 0 ? "Nadie gana esta vez" : w.length === 1 ? "Gana " + esc(pname(w[0])) : "Empate: " + w.map((id) => esc(pname(id))).join(" y ");
-    const rank = g.mode === "roul" ? `<ul class="results">${[...g.players].sort((a, b) => (b.pts || 0) - (a.pts || 0)).map((p) =>
-      `<li class="${w.includes(p.id) ? "win" : ""}"><span class="w">${esc(p.name)}</span><span class="n">${p.pts || 0} ${p.pts === 1 ? "punto" : "puntos"}</span></li>`).join("")}</ul>` : g.mode === "liars" ? lbOverHTML(g) : "";
-    return ["over|" + g.gid + "|" + asked, `<p class="muted">Fin de la partida</p><div class="lemma">${title}</div>${rank}
-      <div><button class="primary" id="againBtn" type="button" ${asked ? "disabled" : ""}>${asked ? "Volviendo a la sala…" : "Jugar otra partida"}</button></div>`];
-  }
-  return g.mode === "roul" ? roulView(g) : g.mode === "liars" ? lbView(g) : chainView(g);
-}
-
-// la ruleta: misma tira para todos (sale de la semilla), se para en la letra elegida
-function runSpin(g) {
-  const caseEl = $("case"), strip = $("strip"); if (!caseEl || !strip) return;
-  const rand = rng(g.spin), TARGET = 38, STEP = 78, tiles = [];
-  for (let i = 0; i < 46; i++) tiles.push(i === TARGET ? g.letter : weightedLetter(rand, null));
-  strip.innerHTML = tiles.map((l, i) => `<div class="tile" data-i="${i}" style="--rc:${rarityOf(l).c}">${esc(l.toUpperCase())}</div>`).join("");
-  const jitter = (rand() - 0.5) * 50;
-  const end = caseEl.clientWidth / 2 - (TARGET * STEP + 36 + jitter);
-  const elapsed = (SPIN - G.t) * 1000;
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const done = () => {
-    const hit = strip.querySelector(`[data-i="${TARGET}"]`); if (hit) hit.classList.add("hit");
-    const r = rarityOf(g.letter), res = $("spinRes");
-    if (res) res.innerHTML = `Ha salido la <strong>${esc(g.letter.toUpperCase())}</strong> <span class="rar" style="--rc:${r.c}">${r.n}</span>`;
-  };
-  if (reduce || elapsed > 1500) { strip.style.transform = `translateX(${end}px)`; done(); return; }
-  strip.style.transform = "translateX(0px)";
-  strip.getBoundingClientRect();
-  strip.style.transition = `transform ${SPIN_MS}ms cubic-bezier(0.12, 0.8, 0.18, 1)`;
-  strip.style.transform = `translateX(${end}px)`;
-  setTimeout(done, SPIN_MS);
-}
-
-let stageKey = "", sideKey = "";
-function paint() {
-  const [key, html] = stageView();
-  if (key !== stageKey) {
-    const keepWord = $("wordInput") && key.startsWith("rwrite") && stageKey.startsWith("rwrite") ? $("wordInput").value : null;
-    stageKey = key; $("stage").innerHTML = html; $("stage").classList.toggle("lb-stage", key.startsWith("lb|"));
-    if (key === "join") $("nameInput").value = myName;
-    if (keepWord !== null && $("wordInput")) $("wordInput").value = keepWord;
-    const wi = $("wordInput"); if (wi) wi.focus();
-    if (key.startsWith("spin|")) runSpin(G);
-  }
-  if (!joined && $("joinNote")) {
-    $("joinForm").querySelector("button").disabled = status !== "ready";
-    const n = G ? G.players.length : 0;
-    $("joinNote").textContent = status !== "ready" ? "Conectando con la mesa…" : n ? (n === 1 ? "Hay 1 jugador en la mesa." : "Hay " + n + " jugadores en la mesa.") + (G.phase !== "lobby" && G.phase !== "over" ? " La partida ya está en marcha: puedes unirte igualmente." : "") : "Todavía no hay nadie. Sé el primero.";
-  }
-  if (G) {
-    const tn = $("tnum"), bar = $("bar"), vt = $("voted"), si = $("subInfo");
-    if (tn) tn.textContent = G.t;
-    if (bar) { bar.firstElementChild.style.width = (G.t / Number(bar.dataset.max)) * 100 + "%"; bar.classList.toggle("low", G.t <= 5); }
-    if (vt) vt.textContent = G.voted;
-    if (si) {
-      const sent = mySent && mySent.gid === G.gid && mySent.r === G.r ? mySent.w : null;
-      const present = G.players.filter((p) => roster().has(p.id)).length;
-      si.textContent = (sent ? "Propuesta enviada: «" + sent + "». Puedes cambiarla mientras quede tiempo. " : "") + "Propuestas: " + G.subs + " de " + present + ".";
-    }
-  }
-  const R = roster();
-  const sk = G ? JSON.stringify([G.mode, G.players, G.turn, G.phase, G.hist, [...R.keys()], G.mode === "liars" && G.lb ? G.lb.p.map((s) => [s.id, s.n, s.sh, s.out]) : 0]) : "";
-  if (sk === sideKey) return;
-  sideKey = sk;
-  $("playersSec").hidden = !G || !G.players.length;
-  $("chainSec").hidden = !G || !G.hist.length;
-  if (!G) return;
-  const playing = G.phase !== "lobby" && G.phase !== "over";
-  $("players").innerHTML = G.players.map((p) => {
-    const cls = [playing && G.mode === "chain" && p.id === G.turn ? "turn" : "", G.mode === "chain" && playing && p.lives <= 0 ? "out" : "", R.has(p.id) ? "" : "away", playing && G.mode === "liars" && G.lb ? lbSideClass(G, p) : ""].join(" ");
-    const tag = (p.id === pid ? "tú" : "") + (R.has(p.id) ? "" : (p.id === pid ? " · " : "") + "desconectado");
-    let side = "";
-    if (G.phase !== "lobby" && G.mode === "liars" && G.lb) side = lbSide(G, p);
-    else if (G.phase !== "lobby" && G.mode === "roul") side = `<span class="pts">${p.pts || 0} ${p.pts === 1 ? "punto" : "puntos"}</span>`;
-    else if (G.phase !== "lobby") {
-      const lives = [0, 1, 2].map((i) => `<i class="${i < p.lives ? "on" : ""}"></i>`).join("");
-      side = `${p.f ? '<span class="fl" title="Una falta: a la segunda pierde una vida">1 falta</span>' : ""}<span class="lives" role="img" aria-label="${p.lives} de 3 vidas">${lives}</span>`;
-    }
-    return `<li class="${cls}"><span class="nm">${esc(p.name)}${tag ? `<span class="tag">${tag}</span>` : ""}</span>${side}</li>`;
-  }).join("");
-  $("chainTitle").textContent = G.mode === "roul" ? "Palabras ganadoras" : "Cadena de palabras";
-  $("chain").classList.toggle("arrows", G.mode !== "roul");
-  $("chain").innerHTML = G.hist.map((w) => `<span>${G.mode === "roul" ? esc(w) : lemma(w)}</span>`).join("");
-}
-
-// ---------- acciones del jugador ----------
-$("stage").addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (e.target.id === "joinForm") {
-    const name = $("nameInput").value.trim().slice(0, 16);
-    if (!name || !room) return;
-    myName = name; store.set("culta.name", name); joined = true;
-    if (noGSince !== null) noGSince = Date.now();
-    pub({ pid, name });
-    paint();
-  } else if (e.target.id === "wordForm" && G && G.phase === "write" && (G.mode === "roul" || G.turn === pid)) {
-    const w = $("wordInput").value, err = wordError(w, G);
-    $("wordErr").textContent = err || "";
-    if (err) return;
-    const word = w.trim().toLowerCase();
-    pub({ act: { gid: G.gid, r: G.r, word } });
-    if (G.mode === "roul") { mySent = { gid: G.gid, r: G.r, w: word }; paint(); }
-  }
-});
-$("stage").addEventListener("change", (e) => { if (e.target.id === "roundsSel") roundsPick = Number(e.target.value) || 5; });
-$("stage").addEventListener("click", (e) => {
-  const b = e.target.closest("button"); if (!b || !G) return;
-  if (b.dataset.go) { askedGo = G.gid; pub({ act: { gid: G.gid, go: 1, mode: b.dataset.go, n: roundsPick } }); paint(); }
-  else if (b.id === "againBtn") { askedAgain = G.gid; pub({ act: { gid: G.gid, again: 1 } }); paint(); }
-  else if (b.dataset.pick !== undefined && G.mode === "roul" && G.phase === "vote") {
-    myPick = { gid: G.gid, r: G.r, i: Number(b.dataset.pick) };
-    pub({ act: { gid: G.gid, r: G.r, pick: myPick.i } }); paint();
-  } else if (b.dataset.v !== undefined && G.mode === "chain" && G.phase === "vote" && G.turn !== pid) {
-    myVote = { gid: G.gid, r: G.r, v: Number(b.dataset.v) };
-    pub({ act: { gid: G.gid, r: G.r, vote: myVote.v } }); paint();
-  }
-});
-
-// ---------- enlace de invitación ----------
-$("copyBtn").addEventListener("click", () => {
-  const done = () => { $("copyBtn").textContent = "Enlace copiado"; setTimeout(() => { $("copyBtn").textContent = "Copiar enlace para invitar"; }, 2000); };
-  const fallback = () => { $("linkBox").hidden = false; $("linkField").value = INVITE_URL; $("linkField").focus(); $("linkField").select(); };
-  try { navigator.clipboard.writeText(INVITE_URL).then(done, fallback); } catch { fallback(); }
-});
-
-// ---------- conexión: cada jugador publica su estado en la mesa (POST /sync) y lee el de todos ----------
-// El estado de la mesa se guarda en la base de datos del sitio, así que todos los jugadores ven
-// la misma mesa aunque el servidor tenga varias instancias.
-function syncRoom(code, onStatus) {
-  const peerId = pid + "-" + Math.random().toString(36).slice(2, 8);
-  let pres = {}, seq = 0; const others = new Map(), hs = [];
-  let isUp = false, lastOk = 0;
-  const snap = () => [{ peer: peerId, presence: pres }, ...[...others].map(([peer, v]) => ({ peer, presence: v.p }))];
-  const fire = () => { const peers = snap(); hs.forEach((h) => h({ peers })); };
-  const mark = (ok) => { if (ok !== isUp) { isUp = ok; onStatus(ok); } };
-  const send = (extra) => {
-    fetch("/sync", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify(Object.assign({ code, id: peerId, p: pres, s: seq }, extra)), keepalive: !!(extra && extra.bye) })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("sync " + r.status))))
-      .then((res) => {
-        for (const q of (res && res.peers) || []) {
-          if (!q || typeof q.id !== "string" || q.id === peerId) continue;
-          if (typeof q.s !== "number" || !q.p || typeof q.p !== "object") continue;
-          const known = others.get(q.id);
-          if (known && q.s < known.s) continue;            // copia vieja llegada tras una reconexión
-          const changed = !known || q.s > known.s;
-          others.set(q.id, { p: changed ? q.p : known.p, s: q.s, at: Date.now() });
-          if (changed) fire();
-        }
-        let ch = false;
-        for (const [k, v] of others) if (Date.now() - v.at > 8000) { others.delete(k); ch = true; }
-        if (ch) fire();
-        lastOk = Date.now(); mark(true);
-      })
-      .catch(() => {});
-  };
-  setInterval(() => { send(); if (isUp && Date.now() - lastOk > 4000) mark(false); }, 1000);
-  addEventListener("pagehide", () => { try { send({ bye: 1 }); } catch {} });
-  return {
-    presence(patch) { const n = { ...pres }; for (const k in patch) { if (patch[k] === null) delete n[k]; else n[k] = patch[k]; } pres = n; seq++; send(); fire(); },
-    onPeers(h) { hs.push(h); setTimeout(fire, 0); },
-  };
-}
-
-// ---------- arranque ----------
-function start() {
-  paint();
-  let everUp = false, offTimer = null;
-  room = syncRoom(CODE, (ok) => {
-    if (ok) {
-      clearTimeout(offTimer); offTimer = null;
-      if (!everUp || status !== "ready") { lastChange = Date.now(); if (noGSince !== null) noGSince = Date.now(); }
-      everUp = true; if (status !== "ready") { status = "ready"; paint(); }
-    } else if (!offTimer) offTimer = setTimeout(() => { offTimer = null; status = "off"; paint(); }, 4000);
-  });
-  setTimeout(() => { if (!everUp) { status = "off"; paint(); } }, 12000);
-  room.onPeers((c) => { peers = c.peers; evaluate(); });
-  setInterval(tick, 1000);
-}
-start();
-</script>
+<script src="app.js"></script>
 </body>
 </html>

@@ -1,13 +1,9 @@
-# Es culta
+# ¿Es culta?
 
-Juego multijugador estático. Funciona en GitHub Pages sin compilar nada.
+Juegos de palabras y cartas multijugador. Cloudflare Workers + Durable Objects.
 
-## Publicar
-1. Sube estos archivos a la raíz de un repositorio de GitHub.
-2. Settings → Pages → Deploy from a branch → `main` / `(root)`.
-3. Comparte `https://TUUSUARIO.github.io/NOMBRE-REPO/` con tus colegas.
-
-## Notas
-- La multijugador usa brokers MQTT públicos (EMQX, HiveMQ, Mosquitto). Pueden ir lentos o caerse.
-- Otro broker: añade `?broker=wss://tu-broker/mqtt` a la URL.
-# es-culta
+- `worker.js`: entrada, mesas (`Room`) y ranking/avatares (`Hub`)
+- `engine.js`: reglas de todos los modos (el servidor manda; los clientes solo piden)
+- `index.html`, `app.js`, `liars-bar.js`, `liars-bar.css`: cliente (Gruvbox, PWA)
+- `words.txt`: diccionario español (lista de ~636.000 palabras, no es el de la RAE)
+- Despliegue: `npx wrangler deploy`

@@ -4,9 +4,9 @@
    Usa las mismas fuentes (--display, --body) y tokens (--gold, --yes, --no) de la app.
    ===================================================================================== */
 :root {
-  --lb-bar: #1A0F12; --lb-bar2: #2A1519; --lb-ink: #F3E9DC; --lb-muted: #B9A898;
-  --lb-felt: #14422E; --lb-felt2: #0C2D1F; --lb-rail: #4A1D24; --lb-brass: #D9A847;
-  --lb-red: #E5483B; --lb-green: #46C384; --lb-paper: #F7F0E1; --lb-paper-ink: #2A1A12; --lb-wine: #7A1E2C;
+  --lb-bar: #1d2021; --lb-bar2: #32302f; --lb-ink: #ebdbb2; --lb-muted: #a89984;
+  --lb-felt: #3d5a3a; --lb-felt2: #25301f; --lb-rail: #665c54; --lb-brass: #fabd2f;
+  --lb-red: #fb4934; --lb-green: #b8bb26; --lb-paper: #fbf1c7; --lb-paper-ink: #3c3836; --lb-wine: #9d0006;
 }
 
 #stage.lb-stage {
@@ -20,10 +20,10 @@
 #stage.lb-stage small { font-size: 0.8125rem; color: var(--lb-muted); font-weight: 400; }
 
 /* lobby: tarjeta del modo */
-.mode.lb-mode { grid-column: 1 / -1; background: linear-gradient(135deg, #2A1519, #14422E); border-color: var(--lb-rail); color: var(--lb-ink); }
+.mode.lb-mode { grid-column: 1 / -1; background: linear-gradient(135deg, #3c3836, #3d5a3a); border-color: var(--lb-rail); color: var(--lb-ink); }
 .mode.lb-mode p { color: var(--lb-muted); }
 .mode.lb-mode h3::before { content: "♠ "; color: var(--lb-brass); }
-.mode.lb-mode button.primary { background: var(--lb-brass); border-color: var(--lb-brass); color: #1A0F12; }
+.mode.lb-mode button.primary { background: var(--lb-brass); border-color: var(--lb-brass); color: #1d2021; }
 
 /* mesa */
 .lb-felt {
@@ -55,16 +55,16 @@
 .lb-gun i.lb-used { background: #6B6460; border-color: #6B6460; }
 
 .lb-badge { position: absolute; top: -0.6rem; right: -0.3rem; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-  padding: 0.1rem 0.45rem; border-radius: 999px; background: #3A2A20; color: var(--lb-ink); border: 1px solid rgba(255, 255, 255, 0.2); white-space: nowrap; }
-.lb-bturn { background: var(--lb-brass); color: #1A0F12; border-color: var(--lb-brass); }
-.lb-bcall { background: var(--lb-brass); color: #1A0F12; border-color: var(--lb-brass); animation: lb-pop 0.4s ease-out both; }
+  padding: 0.1rem 0.45rem; border-radius: 999px; background: #504945; color: var(--lb-ink); border: 1px solid rgba(255, 255, 255, 0.2); white-space: nowrap; }
+.lb-bturn { background: var(--lb-brass); color: #1d2021; border-color: var(--lb-brass); }
+.lb-bcall { background: var(--lb-brass); color: #1d2021; border-color: var(--lb-brass); animation: lb-pop 0.4s ease-out both; }
 .lb-blie { background: var(--lb-red); border-color: var(--lb-red); color: #fff; }
 .lb-btrue { background: var(--lb-green); border-color: var(--lb-green); color: #08150E; }
 
 .lb-center { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; padding: 0.3rem 0 0.2rem; }
 .lb-tablecard { display: flex; align-items: center; gap: 0.6rem; padding: 0.25rem 0.4rem 0.25rem 0.9rem; border-radius: 999px;
   background: rgba(0, 0, 0, 0.35); border: 1.5px dashed var(--lb-brass); font-size: 0.8125rem; color: var(--lb-muted); }
-.lb-tablecard strong { font-family: var(--display); font-size: 1.125rem; color: #1A0F12; background: var(--lb-brass); padding: 0.1rem 0.75rem; border-radius: 999px; }
+.lb-tablecard strong { font-family: var(--display); font-size: 1.125rem; color: #1d2021; background: var(--lb-brass); padding: 0.1rem 0.75rem; border-radius: 999px; }
 .lb-claim { font-size: 0.9375rem; text-align: center; color: var(--lb-ink); text-wrap: balance; }
 
 /* cartas */
@@ -128,7 +128,7 @@ p.lb-late2 { animation: lb-fade 0.4s ease-out 1.9s both; font-size: 1.0625rem; }
 .lb-deal { animation: lb-deal 0.45s ease-out var(--d, 0s) both; }
 .lb-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
 .lb-actions button { border-radius: 0.8rem; padding: 0.85rem 0.5rem; font-weight: 700; color: var(--lb-ink); border-color: rgba(255, 255, 255, 0.25); }
-.lb-actions .lb-play:not(:disabled) { background: var(--lb-brass); border-color: var(--lb-brass); color: #1A0F12; }
+.lb-actions .lb-play:not(:disabled) { background: var(--lb-brass); border-color: var(--lb-brass); color: #1d2021; }
 .lb-actions .lb-liar { border-color: var(--lb-red); color: #fff; background: var(--lb-red); letter-spacing: 0.06em; }
 .lb-actions .lb-liar:not(:disabled) { box-shadow: 0 0 14px rgba(229, 72, 59, 0.55); }
 .lb-rules summary { cursor: pointer; color: var(--lb-muted); font-size: 0.875rem; font-weight: 700; }
